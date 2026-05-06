@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS posts(
     "user_id" INTEGER NOT NULL,
     "content" VARCHAR (255) NOT NULL,
     "likes" INTEGER,
+    "comments" INTEGER,
     "created_at" TIMESTAMPTZ DEFAULT NOW(),
     "updated_at" TIMESTAMPTZ DEFAULT NOW()
 );

@@ -11,6 +11,7 @@ type Post struct {
 	UserID    uint
 	Content   string
 	Likes     int
+	Comments  int
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
