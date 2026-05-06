@@ -24,7 +24,11 @@ func (h *Handler) GetFeed(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, posts)
+	c.JSON(http.StatusOK, gin.H{
+		"page":  page,
+		"limit": limit,
+		"data":  posts,
+	})
 }
 
 func (h *Handler) CreatePost(c *gin.Context) {
