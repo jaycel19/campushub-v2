@@ -2,11 +2,12 @@ package post
 
 import (
 	"sort"
+	"strconv"
 	"time"
 )
 
 type Service interface {
-	GetFeed() ([]Post, error)
+	GetFeed(page, limit string) ([]Post, error)
 	CreatePost(post *Post) error
 }
 
@@ -18,8 +19,21 @@ func NewService(r Repository) Service {
 	return &service{r}
 }
 
-func (s *service) GetFeed() ([]Post, error) {
-	posts, err := s.repo.GetAll()
+func (s *service) GetFeed(pageStr, limitStr string) ([]Post, error) {
+	page, err := strconv.Atoi(pageStr)
+	if err != nil || page < 1 {
+		page = 1
+	}
+
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil || limit < 1 {
+		limit = 10
+	} else if limit > 50 {
+		limit = 50
+	}
+
+	offset := (page - 1) * limit
+	posts, err := s.repo.GetPaginated(offset, limit)
 	if err != nil {
 		return nil, err
 	}

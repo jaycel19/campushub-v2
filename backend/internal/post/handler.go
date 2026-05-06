@@ -15,7 +15,10 @@ func NewHandler(s Service) *Handler {
 }
 
 func (h *Handler) GetFeed(c *gin.Context) {
-	posts, err := h.service.GetFeed()
+	page := c.DefaultQuery("page", "1")
+	limit := c.DefaultQuery("limit", "10")
+
+	posts, err := h.service.GetFeed(page, limit)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
