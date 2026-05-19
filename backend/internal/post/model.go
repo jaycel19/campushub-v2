@@ -7,11 +7,11 @@ import (
 )
 
 type Post struct {
-	ID        uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
-	UserID    uint
-	Content   string
-	Likes     int
-	Comments  int
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        uuid.UUID `json:"id" gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
+	UserID    uint      `json:"user_id"`
+	Content   string    `json:"content"`
+	Likes     int       `json:"likes"`
+	Comments  int       `json:"comments"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
