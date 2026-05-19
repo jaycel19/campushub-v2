@@ -14,12 +14,24 @@ func NewHandler(s Service) *Handler {
 	return &Handler{s}
 }
 
-func (h *Handler) Register(c *gin.Context) {
-	var user User
+type RegisterRequest struct {
+	Username string `json:"username" binding:"required"`
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required,min=6"`
+}
 
-	if err := c.ShouldBindJSON(&user); err != nil {
+func (h *Handler) Register(c *gin.Context) {
+	var req RegisterRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	user := User{
+		Username: req.Username,
+		Email:    req.Email,
+		Password: req.Password,
 	}
 
 	err := h.service.Register(&user)
