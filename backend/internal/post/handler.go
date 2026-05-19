@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type Handler struct {
@@ -37,14 +38,36 @@ func (h *Handler) GetFeed(c *gin.Context) {
 
 func (h *Handler) CreatePost(c *gin.Context) {
 	var req CreatePostRequest
-	var post Post
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err := h.service.CreatePost(&post)
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "unauthorized",
+		})
+		return
+	}
+
+	userIDStr := userID.(string)
+
+	parsedID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "invalid user id",
+		})
+		return
+	}
+
+	post := Post{
+		UserID:  parsedID,
+		Content: req.Content,
+	}
+
+	err = h.service.CreatePost(&post)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
