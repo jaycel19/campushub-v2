@@ -2,7 +2,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS posts(
     "id" uuid PRIMARY KEY NOT NULL DEFAULT (uuid_generate_v4()),
-    "user_id" INTEGER NOT NULL,
+    "user_id" INTEGER,
     "content" VARCHAR (255) NOT NULL,
     "likes" INTEGER,
     "comments" INTEGER,

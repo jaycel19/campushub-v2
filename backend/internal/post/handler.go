@@ -14,6 +14,10 @@ func NewHandler(s Service) *Handler {
 	return &Handler{s}
 }
 
+type CreatePostRequest struct {
+	Content string `json:"content" binding:"required"`
+}
+
 func (h *Handler) GetFeed(c *gin.Context) {
 	page := c.DefaultQuery("page", "1")
 	limit := c.DefaultQuery("limit", "10")
@@ -32,9 +36,10 @@ func (h *Handler) GetFeed(c *gin.Context) {
 }
 
 func (h *Handler) CreatePost(c *gin.Context) {
+	var req CreatePostRequest
 	var post Post
 
-	if err := c.ShouldBindJSON(&post); err != nil {
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
