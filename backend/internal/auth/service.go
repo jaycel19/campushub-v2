@@ -12,6 +12,7 @@ import (
 type Service interface {
 	Register(user *User) error
 	Login(email, password string) (string, error)
+	GetAll() ([]User, error)
 }
 
 type service struct {
@@ -57,4 +58,9 @@ func (s *service) Login(email, password string) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+func (s *service) GetAll() ([]User, error) {
+	users, err := s.repo.GetAll()
+	return users, err
 }

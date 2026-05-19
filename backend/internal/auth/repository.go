@@ -5,6 +5,7 @@ import "gorm.io/gorm"
 type Repository interface {
 	Create(user *User) error
 	FindByEmail(email string) (*User, error)
+	GetAll() ([]User, error)
 }
 
 type repository struct {
@@ -23,4 +24,12 @@ func (r *repository) FindByEmail(email string) (*User, error) {
 	var user User
 	err := r.db.Where("email = ?", email).First(&user).Error
 	return &user, err
+}
+
+func (r *repository) GetAll() ([]User, error) {
+	var users []User
+
+	err := r.db.Order("created_at DESC").Find(&users).Error
+
+	return users, err
 }
