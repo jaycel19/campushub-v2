@@ -5,8 +5,10 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jaycel19/campushub/backend/internal/auth"
 	"github.com/jaycel19/campushub/backend/internal/post"
 	"github.com/jaycel19/campushub/backend/pkg/database"
+	"github.com/jaycel19/campushub/backend/pkg/middlewares"
 	"github.com/joho/godotenv"
 )
 
@@ -21,14 +23,23 @@ func main() {
 		log.Fatal(err)
 	}
 
+	authRepo := auth.NewRepository(db)
+	authService := auth.NewService(authRepo)
+	authHandler := auth.NewHandler(authService)
+
 	postRepo := post.NewRepository(db)
 	postService := post.NewService(postRepo)
 	postHandler := post.NewHandler(postService)
 
 	r := gin.Default()
 
+	// post routes
 	r.GET("/feed", postHandler.GetFeed)
-	r.POST("/posts", postHandler.CreatePost)
+	r.POST("/posts", middlewares.AuthMiddleware(), postHandler.CreatePost) // protected route
+
+	// auth routes
+	r.POST("/auth/register", authHandler.Register)
+	r.POST("/auth/login", authHandler.Login)
 
 	port := os.Getenv("HTTP_PORT")
 	r.Run(":" + port)
