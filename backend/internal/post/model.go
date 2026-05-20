@@ -8,7 +8,7 @@ import (
 
 type Post struct {
 	ID        uuid.UUID `json:"id" gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
-	UserID    uuid.UUID `json:"user_id" gorm:"type: uuid"`
+	UserID    uuid.UUID `json:"user_id" gorm:"type:uuid"`
 	Content   string    `json:"content"`
 	Likes     int       `json:"likes"`
 	Comments  int       `json:"comments"`
