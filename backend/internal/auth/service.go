@@ -6,12 +6,14 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type Service interface {
 	Register(user *User) error
 	Login(email, password string) (string, error)
+	GetMe(userID uuid.UUID) (*User, error)
 	GetAll() ([]User, error)
 }
 
@@ -58,6 +60,11 @@ func (s *service) Login(email, password string) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+func (s *service) GetMe(userID uuid.UUID) (*User, error) {
+	users, err := s.repo.GetMe(userID)
+	return users, err
 }
 
 func (s *service) GetAll() ([]User, error) {

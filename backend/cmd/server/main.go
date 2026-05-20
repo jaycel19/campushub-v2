@@ -40,7 +40,8 @@ func main() {
 	// auth routes
 	r.POST("/auth/register", authHandler.Register)
 	r.POST("/auth/login", authHandler.Login)
-	r.GET("/users", middlewares.AuthMiddleware(), authHandler.GetAll)
+	r.GET("/users", middlewares.AuthMiddleware(), authHandler.GetAll) // protected route
+	r.GET("/me", middlewares.AuthMiddleware(), authHandler.GetMe)     // protected route
 
 	port := os.Getenv("HTTP_PORT")
 	r.Run(":" + port)

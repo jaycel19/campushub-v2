@@ -1,10 +1,14 @@
 package auth
 
-import "gorm.io/gorm"
+import (
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
 
 type Repository interface {
 	Create(user *User) error
 	FindByEmail(email string) (*User, error)
+	GetMe(userID uuid.UUID) (*User, error)
 	GetAll() ([]User, error)
 }
 
@@ -32,4 +36,12 @@ func (r *repository) GetAll() ([]User, error) {
 	err := r.db.Order("created_at DESC").Find(&users).Error
 
 	return users, err
+}
+
+func (r *repository) GetMe(userID uuid.UUID) (*User, error) {
+	var user User
+
+	err := r.db.Where("id = ?", userID).First(&user).Error
+
+	return &user, err
 }
