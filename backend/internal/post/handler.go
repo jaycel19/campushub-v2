@@ -52,7 +52,13 @@ func (h *Handler) CreatePost(c *gin.Context) {
 		return
 	}
 
-	userIDStr := userID.(string)
+	userIDStr, ok := userID.(string)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "invalid user id type",
+		})
+		return
+	}
 
 	parsedID, err := uuid.Parse(userIDStr)
 	if err != nil {
@@ -73,5 +79,13 @@ func (h *Handler) CreatePost(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, post)
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "post created",
+		"data": gin.H{
+			"id":         post.ID,
+			"content":    post.Content,
+			"user_id":    post.UserID,
+			"created_at": post.CreatedAt,
+		},
+	})
 }
