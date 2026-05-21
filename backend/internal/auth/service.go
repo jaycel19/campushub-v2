@@ -36,6 +36,7 @@ func (s *service) Register(user *User) error {
 }
 
 func (s *service) Login(email, password string) (string, error) {
+	const TokenDuration = time.Hour * 24
 	user, err := s.repo.FindByEmail(email)
 	if err != nil {
 		return "", errors.New("invalid credentials")
@@ -49,7 +50,7 @@ func (s *service) Login(email, password string) (string, error) {
 	// Create JWT
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": user.ID,
-		"exp":     time.Now().Add(time.Hour * 24).Unix(),
+		"exp":     time.Now().Add(TokenDuration).Unix(),
 	})
 
 	secret := os.Getenv("JWT_SECRET")
