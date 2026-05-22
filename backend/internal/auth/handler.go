@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 type Handler struct {
@@ -34,13 +33,7 @@ func (h *Handler) Register(c *gin.Context) {
 		return
 	}
 
-	user := User{
-		Username: req.Username,
-		Email:    req.Email,
-		Password: req.Password,
-	}
-
-	err := h.service.Register(&user)
+	err := h.service.Register(&req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -70,31 +63,9 @@ func (h *Handler) Login(c *gin.Context) {
 }
 
 func (h *Handler) GetMe(c *gin.Context) {
+	userIDStr := c.GetString("user_id")
 
-	userID, exists := c.Get("user_id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "unauthorized",
-		})
-		return
-	}
-	userIDStr, ok := userID.(string)
-	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "invalid user id type",
-		})
-		return
-	}
-	parsedID, err := uuid.Parse(userIDStr)
-
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "invalid user id",
-		})
-		return
-	}
-
-	user, err := h.service.GetMe(parsedID)
+	user, err := h.service.GetMe(userIDStr)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

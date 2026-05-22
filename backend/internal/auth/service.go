@@ -7,13 +7,14 @@ import (
 
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
+	"github.com/jaycel19/campushub/backend/internal/shared"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type Service interface {
-	Register(user *User) error
+	Register(req *RegisterRequest) error
 	Login(email, password string) (string, error)
-	GetMe(userID uuid.UUID) (*User, error)
+	GetMe(userIDStr string) (*User, error)
 	GetAll() ([]User, error)
 }
 
@@ -25,14 +26,20 @@ func NewService(r Repository) Service {
 	return &service{r}
 }
 
-func (s *service) Register(user *User) error {
-	hashed, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
+func (s *service) Register(req *RegisterRequest) error {
+
+	hashed, err := bcrypt.GenerateFromPassword([]byte(req.Password), 14)
 	if err != nil {
 		return err
 	}
+	req.Password = string(hashed)
+	user := User{
+		Username: req.Username,
+		Email:    req.Email,
+		Password: req.Password,
+	}
 
-	user.Password = string(hashed)
-	return s.repo.Create(user)
+	return s.repo.Create(&user)
 }
 
 func (s *service) Login(email, password string) (string, error) {
@@ -63,7 +70,11 @@ func (s *service) Login(email, password string) (string, error) {
 	return tokenString, nil
 }
 
-func (s *service) GetMe(userID uuid.UUID) (*User, error) {
+func (s *service) GetMe(userIDStr string) (*User, error) {
+	userID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		return nil, shared.ErrInvalidUserID
+	}
 	users, err := s.repo.GetMe(userID)
 	return users, err
 }
