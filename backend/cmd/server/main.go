@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jaycel19/campushub/backend/internal/auth"
+	"github.com/jaycel19/campushub/backend/internal/comment"
 	"github.com/jaycel19/campushub/backend/internal/post"
 	"github.com/jaycel19/campushub/backend/pkg/database"
 	"github.com/jaycel19/campushub/backend/pkg/middlewares"
@@ -31,6 +32,10 @@ func main() {
 	postService := post.NewService(postRepo)
 	postHandler := post.NewHandler(postService)
 
+	commentRepo := comment.NewRepository(db)
+	commentService := comment.NewService(commentRepo)
+	commentHandler := comment.NewHandler(commentService)
+
 	r := gin.Default()
 
 	// post routes
@@ -42,6 +47,21 @@ func main() {
 	r.POST("/auth/login", authHandler.Login)
 	r.GET("/users", middlewares.AuthMiddleware(), authHandler.GetAll) // protected route
 	r.GET("/me", middlewares.AuthMiddleware(), authHandler.GetMe)     // protected route
+
+	// comment routes
+	r.POST("/posts/:id/comments",
+		middlewares.AuthMiddleware(),
+		commentHandler.CreateComment,
+	)
+
+	r.GET("/posts/:id/comments",
+		commentHandler.GetComments,
+	)
+
+	r.DELETE("/comments/:id",
+		middlewares.AuthMiddleware(),
+		commentHandler.DeleteComment,
+	)
 
 	port := os.Getenv("HTTP_PORT")
 	r.Run(":" + port)

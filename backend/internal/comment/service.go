@@ -16,6 +16,8 @@ type service struct {
 	repo Repository
 }
 
+var ErrUnauthorized = errors.New("unauthorized")
+
 func NewService(r Repository) Service {
 	return &service{r}
 }
@@ -29,7 +31,7 @@ func (s *service) GetComments(postID uuid.UUID) ([]Comment, error) {
 }
 
 func (s *service) DeleteComment(commentID, userID uuid.UUID) error {
-	var ErrUnauthorized = errors.New("unauthorized")
+
 	comment, err := s.repo.GetByID(commentID)
 	if err != nil {
 		return err
